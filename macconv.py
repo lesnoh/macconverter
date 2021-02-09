@@ -29,8 +29,7 @@ def plain_to_aruba(mac_plain):
     return (aruba_mac)
 
 def main():
-    mac = args.input
-    mac_plain = strip_mac(mac)
+    mac_plain = strip_mac(args.input)
     if args.format == "cisco":
         print (plain_to_cisco(mac_plain))
     elif args.format == "linux":
