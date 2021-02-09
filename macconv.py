@@ -3,13 +3,14 @@ __version__ = 0.1
 import sys,argparse
 
 parser = argparse.ArgumentParser(description='Transform MAC addresses into common formats')
-parser.add_argument('-i','--input', metavar="00.11:33-ab:cdef", type=str, required=True, help="Input MAC address -:. Characters will be stripped")
+parser.add_argument('infile', default=sys.stdin, type=argparse.FileType('r'),nargs='?', help="stdin")
+parser.add_argument('-i','--input', metavar="00.11:33-ab:cdef", type=str, help="MAC address -:. Characters will be stripped")
 parser.add_argument('-f','--format',metavar="[linux,cisco,aruba]", type=str, help="Destination format. Blank generates all")
 args = parser.parse_args()
 
 
 def strip_mac(original_mac):
-    result =  original_mac.translate({ord(i): None for i in ':.-'})
+    result =  original_mac.translate({ord(i): None for i in ':.-\n'})
     if len(result) == 12:
         return result
     else:
@@ -29,7 +30,9 @@ def plain_to_aruba(mac_plain):
     return (aruba_mac)
 
 def main():
-    mac_plain = strip_mac(args.input)
+    mac_plain = strip_mac(args.infile.read())
+    print (mac_plain)
+    #mac_plain = strip_mac(args.input)
     if args.format == "cisco":
         print (plain_to_cisco(mac_plain))
     elif args.format == "linux":
