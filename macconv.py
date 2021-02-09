@@ -1,8 +1,9 @@
 #!/usr/bin/python
-__version__ = 0.2
+__version__ = 0.3
 import sys
 import argparse
 import re
+from termcolor import colored
 
 parser = argparse.ArgumentParser(description='Transform MAC addresses into common formats')
 parser.add_argument('infile', default=sys.stdin, type=argparse.FileType('r'),nargs='?', help="read MACs from stdin")
@@ -41,24 +42,25 @@ def convert(mac_plain):
         print (plain_to_linux(mac_plain))
         print (plain_to_aruba(mac_plain))
 
+def validate_input_and_convert(stdin_mac):
+    mac_plain = strip_mac(stdin_mac)
+    if mac_plain:
+        convert(strip_mac(mac_plain))
+    else:
+        print(colored((stdin_mac.strip(), "is no valid MAC"), 'red'), file=sys.stderr)
 
 def main():
     got_input = None
     if not sys.stdin.isatty():
         got_input = True
         for stdin_mac in args.infile:
-            mac_plain = strip_mac(stdin_mac)
-            if mac_plain:
-                convert(strip_mac(mac_plain))
-            else:
-                print (stdin_mac.strip(), "is no valid MAC")
-
+            validate_input_and_convert(stdin_mac)
     if args.input: 
-        convert(strip_mac(args.input))
+        validate_input_and_convert(args.input)
         got_input = True
     else:
         if not got_input:
-            print ("no CLI input")
+            print ("no CLI or STDIN input")
 
 if __name__ == "__main__":
     main()
